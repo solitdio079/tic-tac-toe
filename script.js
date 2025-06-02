@@ -182,6 +182,7 @@ const displayController = (function(){
         const currentSpanEl = document.createElement("span")
         currentSpanEl.textContent = `${fullName} (${mark})`
         currentEl.textContent = "Current Player: "
+        currentEl.classList.add("btn")
         currentEl.appendChild(currentSpanEl)
         currentEl.style.display = "block"
 
