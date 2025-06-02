@@ -1,0 +1,91 @@
+* {
+    box-sizing: border-box;
+}
+
+#board{
+    width: 80%;
+    margin: 2rem auto;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3, clamp(15vw,25vw,25vh));
+    border: 1px solid gray;
+    display: none;
+}
+h1{
+    text-align: center;
+    margin: 1rem auto;
+}
+.cell{
+    border: 1px solid gray;
+    background-color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(10vw,20vw,20vh);
+}
+#startForm {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: clamp(50vh,80%,90vh);
+    margin: 1rem auto;
+    align-items: center;
+}
+.form-row{
+    display: flex;
+    gap: 1rem;
+}
+label{
+    color: gray;
+}
+.form-control{
+    display: flex;
+    flex-direction: column;
+}
+input{
+    border: 1px solid green;
+    font-size: 1.25rem;
+    padding: .25rem;
+    border-radius: 5px;
+    margin: 5px 0;
+}
+input:invalid{
+    border: 1px solid red;
+}
+.btn{
+    background-color:  #4681f4;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding:10px 15px;
+    font-size: 1.25rem;
+    border-radius: 10px;
+}
+.btn:hover{
+    background-color: #55c2da;
+    
+}
+
+#current{
+    text-align: center;
+    display: none;
+}
+#current span{
+    font-weight: bold;
+}
+#result{
+    text-align: center;
+    display: none;
+}
+.success {
+    color: green;
+}
+.restartContainer{
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.hidden{
+    display: none;
+}

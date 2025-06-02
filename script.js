@@ -1,72 +1,237 @@
-console.log("Welcome to the Tic Tac Toe Game!")
+const startFormEl = document.querySelector("#startForm")
+const boardEl = document.querySelector("#board")
+const currentEl = document.querySelector("#current")
+const resultEl = document.querySelector("#result")
+const restartBtnEl = document.querySelector("#restart")
+const newPlayersEl = document.querySelector("#newPlayers")
+
+
+const Game = (function(){
+    const player1 = createPlayer()
+    const player2  = createPlayer()
+    let lastPlayers = []
+    let currentPlayer = player1
+    //displayController.showCurrentPlayer(currentPlayer.getName(),currentPlayer.getMarker())
+
+    const winningPositions = [[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6],[0,3,6],[1,4,7],[2,5,8]]
+    let winner
+    const start = (player1Name,player1Mark,player2Name,player2Mark) => {
+        if(player1Mark === player2Mark){
+            alert("Change Player marks")
+            return
+        }
+        lastPlayers = [player1Name,player1Mark,player2Name,player2Mark]
+        // save to localStorage
+        winner = null
+        Gameboard.resetBoard()
+        player1.setMarker(player1Mark)
+        player2.setMarker(player2Mark)
+        player1.setName(player1Name)
+        player2.setName(player2Name)
+        displayController.showBoard(Gameboard.getBoard())
+        displayController.showCurrentPlayer(currentPlayer.getName(),currentPlayer.getMarker())
+    }
+    const play = (position) => {
+        if(currentPlayer.getMarker() ===""){
+            console.log("Start or restart the game!")
+            return
+        }else if(checkPosition(position)){
+            Gameboard.placeMarker(currentPlayer.getMarker(),position)
+            currentPlayer.addPosition(position)
+            if(currentPlayer.getPositions().length >=3){
+                checkWinner()
+                if(winner) { 
+                    endGame()
+                    return
+                }
+                checkTie()
+            }
+            currentPlayer = player1.getMarker() === currentPlayer.getMarker() ? player2 : player1
+            displayController.showBoard(Gameboard.getBoard())
+            displayController.showCurrentPlayer(currentPlayer.getName(),currentPlayer.getMarker())
+        }
+    }
+    const checkPosition =(position) => {
+        const currentBoard = Gameboard.getBoard()
+        if(currentBoard[position]){  
+            //console.log("Position ", position, "already has ", currentBoard[position])
+            return false  
+        }
+        return true
+
+    }
+    const checkWinner = (player=currentPlayer) => {
+        winningPositions.forEach(el => {
+            if(el.every(item => player.getPositions().includes(item))){
+                console.log(el)
+                displayController.showBoard(Gameboard.getBoard())
+                winner = player
+                //console.log(winner)
+            }
+        })
+    }
+    const checkTie = () => {
+        const currentBoard = Gameboard.getBoard()
+       if(currentBoard.every(item => Boolean(item) === true) && !winner){
+        endGame()
+       }
+       
+    }
+    const endGame = () => {
+       
+        if(winner){
+            displayController.showResult(winner.getName(),winner.getMarker())
+            displayController.toggleRestart()
+        }else{
+            displayController.showResult()
+            displayController.toggleRestart()
+        }
+        player1.setMarker("")
+        player2.setMarker("")
+        player1.setName("")
+        player2.setName("")
+        player1.resetPositions()
+        player2.resetPositions()
+        Gameboard.resetBoard()
+    }
+    const reset = () => {
+       player1.setMarker(lastPlayers[1]|| "")
+       player2.setMarker(lastPlayers[3] || "")
+       player1.setName(lastPlayers[0] || "")
+       player2.setName(lastPlayers[2]|| "")
+       currentPlayer = player1
+       displayController.showBoard(Gameboard.getBoard())
+       displayController.showCurrentPlayer(currentPlayer.getName(),currentPlayer.getMarker())
+       displayController.hideResult()
+       displayController.toggleRestart()
+       winner = null
+    }
+    const getNewPlayers = () => {
+        displayController.showStartForm()
+      
+    }
+    return{start, play,reset, getNewPlayers}
+
+})()
 
 const Gameboard = (function(){
-    const gameboardArray = new Array(9)
-    let lastMark = ""
+    let boardArray = new Array(9).fill(null)
+    const getBoard = () => boardArray 
+
+    const placeMarker = (marker, position) =>{
+        boardArray[position] = marker
     
-    const getBoard = () => gameboardArray
-    const placeMark = (mark,index) => {
-        if(mark !== lastMark){  
-            gameboardArray[index] = mark 
-            lastMark = mark
+    }
+    const resetBoard = () => {
+        boardArray = new Array(9).fill(null)
+
+    } 
+    return {getBoard, placeMarker,resetBoard}
+})()
+
+function createPlayer(){
+    let marker = ""
+    let name = ""
+    let positions = []
+
+    const setMarker = (newMarker) => {
+        marker = newMarker
+    }
+    const getMarker = () => marker
+
+    const getName = () => name 
+
+    const setName = (newName) => [
+        name = newName
+    ]
+
+    const addPosition = (newPosition) => {
+        positions.push(+newPosition || 0)
+    }
+    const resetPositions = ()=>{
+        positions = []
+    }
+    const getPositions = () => positions
+    return {getMarker, setMarker, addPosition, getPositions, getName, setName, resetPositions}
+}
+
+const displayController = (function(){
+    const showBoard = (boardArray)=> {
+        boardEl.style.display = "grid"
+        startFormEl.style.display = "none"
+        boardEl.innerHTML = ""
+        boardArray.forEach((el,index) => {
+            const cellEl = document.createElement("div")
+            cellEl.setAttribute("data-position", index)
+            cellEl.classList.add("cell")
+            cellEl.textContent = el ? el : ""
+            boardEl.appendChild(cellEl)
+        })
+        
+    }
+
+    const showCurrentPlayer = (fullName,mark) => {
+        currentEl.innerHTML = ""
+        const currentSpanEl = document.createElement("span")
+        currentSpanEl.textContent = `${fullName} (${mark})`
+        currentEl.textContent = "Current Player: "
+        currentEl.appendChild(currentSpanEl)
+        currentEl.style.display = "block"
+
+    }
+
+    const showResult = (winnerName="",winnerMarker="") => {
+       
+        resultEl.textContent = ""
+        resultEl.style.display= "block"
+        if(winnerName === "") { 
+            resultEl.textContent = "It's a tie!"
+            
+        }else{
+            resultEl.classList.add("success")
+            resultEl.textContent = `Winner: ${winnerName} (${winnerMarker})`
         }
 
+
+        
+
     }
-    const getLastMark = () => lastMark
-    const setLastMark = (mark) => {
-        lastMark = mark
+    const hideResult = () => {
+        resultEl.style.display = "none"
     }
-    return {getBoard, placeMark, getLastMark}
+    const toggleRestart = () => {
+        restartBtnEl.classList.toggle("hidden")
+        newPlayersEl.classList.toggle("hidden")
+    }
+    const showStartForm = () => {
+        startFormEl.style.display="flex"
+        boardEl.style.display = "none"
+        toggleRestart()
+        resultEl.style.display = "none"
+        currentEl.style.display = "none"
+    }
+
+    return {showBoard, showCurrentPlayer, showResult,toggleRestart, showStartForm,hideResult}
 
 })()
 
+startFormEl.addEventListener("submit", (e) => {
+    e.preventDefault() 
+    const formData = new FormData(startFormEl)
+    Game.start(formData.get("player1Name"), formData.get("player1Mark"),formData.get("player2Name"),formData.get("player2Mark"))
+    startFormEl.reset()
+})
 
-
-const createPlayer = function(initName){
-    let mark = ""
-    let positions = []
-    let name = initName
-    let lastPosition
-
-    const setMark = (playerMark) => {
-        mark = playerMark
+boardEl.addEventListener("click", (e) => {
+    console.log(e.target)
+    const position =  e.target.getAttribute("data-position")
+    if(position){
+        Game.play(position)
     }
-    const getMark = () => mark
-
-    const placeMark = (position) => { 
-        lastPosition = position
-        return [getMark(),position] 
-    }
-    const addPosition = (position) => {
-        positions.push(position)
-    }
-
-    const getName = () => name
-    const setName = (playerName) => {name=playerName}
-
-    const getPostions = () => positions
-    const getLastPosition = () => lastPosition
-
-    return {getMark,setMark,placeMark, getPostions, getName, setName,getLastPosition, addPosition}
-}
-const player1 = createPlayer("Player 1")
-const player2 = createPlayer("Player 2")
-player1.setMark("W")
-player2.setMark("Y")
-Gameboard.placeMark(...player1.placeMark(0))
-if(Gameboard.getBoard()[player1.getLastPosition()] === player1.getMark()) player1.addPosition(player1.getLastPosition())
-Gameboard.placeMark(...player2.placeMark(1))
-if(Gameboard.getBoard()[player2.getLastPosition()]  === player2.getMark()) player2.addPosition(player2.getLastPosition())
-Gameboard.placeMark(...player1.placeMark(2))
-if(Gameboard.getBoard()[player1.getLastPosition()]  === player1.getMark()) player1.addPosition(player1.getLastPosition())
-Gameboard.placeMark(...player1.placeMark(3))
-if(Gameboard.getBoard()[player1.getLastPosition()]  === player1.getMark()) player1.addPosition(player1.getLastPosition())
-
-console.log(Gameboard.getBoard())
-
-console.log(player1.getPostions())
-console.log(player2.getPostions())
-
-const Gameflow = (function(){
-
-})()
+})
+restartBtnEl.addEventListener("click",()=>{
+    Game.reset()
+})
+newPlayersEl.addEventListener("click", () => {
+    Game.getNewPlayers()
+})

@@ -8,6 +8,42 @@
 </head>
 <body>
     <h1>Tic Tac Toe</h1>
+
+    <form id="startForm" action="">
+        <div class="form-row">
+            <div class="form-control">
+                <label for="player1Name">Player 1 Name</label>
+                <input id="player1Name" minlength="2" required type="text" name="player1Name">
+            </div>
+            <div class="form-control">
+                <label for="player1Mark">Player 1 Mark</label>
+                <input id="player1Mark" minlength="1" maxlength="1" required type="text" name="player1Mark">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-control">
+                <label for="player2Name">Player 2 Name</label>
+                <input id="player2Name" minlength="2" required type="text" name="player2Name">
+            </div>
+            <div class="form-control">
+                <label for="player2Mark">Player 2 Mark</label>
+                <input id="player2Mark" minlength="1" maxlength="1" required type="text" name="player2Mark">
+            </div>
+        </div>
+        <button class="btn">Start</button>
+    </form>
+
+    <p id="current">Current Player: <span>FullName (Mark) </span></p>
+    <h3 id="result">Player1(Mark) Wins</h3>
+    <div class="restartContainer">
+        <button id="restart" class="btn hidden">Restart</button>
+        <button id="newPlayers" class="btn hidden">New Players</button>
+    </div>
+   
+
+    <div id="board">
+    </div>
     
 
     <script src="script.js"></script>
