@@ -11,8 +11,8 @@ const Game = (function(){
     const player2  = createPlayer()
     let lastPlayers = []
     let currentPlayer = player1
+    let winnerArray =[]
     //displayController.showCurrentPlayer(currentPlayer.getName(),currentPlayer.getMarker())
-
     const winningPositions = [[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6],[0,3,6],[1,4,7],[2,5,8]]
     let winner
     const start = (player1Name,player1Mark,player2Name,player2Mark) => {
@@ -23,6 +23,7 @@ const Game = (function(){
         lastPlayers = [player1Name,player1Mark,player2Name,player2Mark]
         // save to localStorage
         winner = null
+        winnerArray = []
         Gameboard.resetBoard()
         player1.setMarker(player1Mark)
         player2.setMarker(player2Mark)
@@ -63,7 +64,7 @@ const Game = (function(){
     const checkWinner = (player=currentPlayer) => {
         winningPositions.forEach(el => {
             if(el.every(item => player.getPositions().includes(item))){
-                console.log(el)
+                winnerArray = el
                 displayController.showBoard(Gameboard.getBoard())
                 winner = player
                 //console.log(winner)
@@ -81,6 +82,7 @@ const Game = (function(){
        
         if(winner){
             displayController.showResult(winner.getName(),winner.getMarker())
+            displayController.showBoard(Gameboard.getBoard(),winnerArray)
             displayController.toggleRestart()
         }else{
             displayController.showResult()
@@ -105,13 +107,12 @@ const Game = (function(){
        displayController.hideResult()
        displayController.toggleRestart()
        winner = null
+       winnerArray = []
     }
     const getNewPlayers = () => {
         displayController.showStartForm()
-      
     }
     return{start, play,reset, getNewPlayers}
-
 })()
 
 const Gameboard = (function(){
@@ -120,15 +121,12 @@ const Gameboard = (function(){
 
     const placeMarker = (marker, position) =>{
         boardArray[position] = marker
-    
     }
     const resetBoard = () => {
         boardArray = new Array(9).fill(null)
-
     } 
     return {getBoard, placeMarker,resetBoard}
 })()
-
 function createPlayer(){
     let marker = ""
     let name = ""
@@ -156,7 +154,7 @@ function createPlayer(){
 }
 
 const displayController = (function(){
-    const showBoard = (boardArray)=> {
+    const showBoard = (boardArray, winnerArray=null)=> {
         boardEl.style.display = "grid"
         startFormEl.style.display = "none"
         boardEl.innerHTML = ""
@@ -167,6 +165,15 @@ const displayController = (function(){
             cellEl.textContent = el ? el : ""
             boardEl.appendChild(cellEl)
         })
+        if (winnerArray) {
+            const allCells = [...document.querySelectorAll(".cell")]
+            console.log("winnerArray", winnerArray)
+            const winnerCells =  allCells.filter(item => winnerArray.includes(+item.getAttribute("data-position")))
+            winnerCells.forEach(item => {
+                item.classList.add("bg-success")
+                item.classList.add("text-white")
+            })
+        }
         
     }
 
@@ -179,6 +186,7 @@ const displayController = (function(){
         currentEl.style.display = "block"
 
     }
+   
 
     const showResult = (winnerName="",winnerMarker="") => {
        

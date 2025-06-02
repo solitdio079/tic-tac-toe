@@ -11,10 +11,15 @@
     border: 1px solid gray;
     display: none;
 }
-h1{
-    text-align: center;
-    margin: 1rem auto;
+.header,.footer{
+    display: flex;
+    justify-content: center;
 }
+.footer{
+    background-color: #010101;
+    padding: 1rem;
+}
+
 .cell{
     border: 1px solid gray;
     background-color: #eee;
@@ -88,4 +93,10 @@ input:invalid{
 
 .hidden{
     display: none;
+}
+.bg-success{
+    background-color: green;
+}
+.text-white{
+    color: white;
 }
